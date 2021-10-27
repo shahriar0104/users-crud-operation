@@ -1,0 +1,27 @@
+{
+  "name": "users-crud-operation",
+  "version": "1.0.0",
+  "description": "sample user crud project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/index.js --exec babel-node -e js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1"
+  },
+  "dependencies": {
+    "apollo-server-express": "^3.4.0",
+    "apollo-server-hapi": "^3.4.0",
+    "express": "^4.17.1",
+    "graphql": "^15.7.0",
+    "mongodb": "^4.1.3",
+    "mongoose": "^6.0.12",
+    "nodemon": "^2.0.14"
+  }
+}
