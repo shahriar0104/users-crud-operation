@@ -14,6 +14,10 @@ export const resolvers={
                     })
                 })
             },
+            getUserByID:(root, {userId})=>{
+                const user = Users.findById(userId).exec();
+                return user;
+            }
     },
     Mutation:{
         createUser: (root,{ input }) => {
@@ -36,5 +40,26 @@ export const resolvers={
                 })
             })
         },
-    },
+        deleteUser: async (root, {userId}) => {
+            try{
+                await Users.findByIdAndDelete(userId);
+                return true;
+            } catch(err){
+                return false;
+            }
+            
+        },
+        updateUser: async (root, {userId, userUpdatedDetails}) => {
+            try {
+                await Users.findByIdAndUpdate(
+                    userId,
+                    userUpdatedDetails
+                )
+                return true;
+                
+            } catch(err){
+                return false
+            }
+        }
+    }
 };

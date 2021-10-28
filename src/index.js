@@ -9,6 +9,7 @@ const init = async () => {
     const app = Hapi.server({
         port: PORT
     });
+    
     const server = new ApolloServer({typeDefs, resolvers });
 
     await server.start();
@@ -19,4 +20,3 @@ const init = async () => {
 };
 
 init().then(r => console.log('server started'));
-
