@@ -1,61 +1,50 @@
 import { gql } from 'apollo-server-hapi';
 
 export const typeDefs = gql`
-    type User{
-       _id:ID
-       firstName:String
-       lastName:String
-       gender:Gender
-       age:Int
-       email: String
-       password: String
-       role: String
+
+    input CommentInput{
+        postId:String
+        commentor:String
+        commentDetails:String
     }
 
-    enum Gender{
-        MALE
-        FEMALE
-        OTHER
+    input PostInput{
+        title: String
+        details:String
+        comments: CommentInput
+    }
+    
+    input UpdatedDetails{
+        details:String
     }
 
-    input UserInput{
-        _id:ID
-        firstName:String
-        lastName:String
-        gender:Gender
-        language:String
-        age:Int
-        email: String
-        password: String
-        role: String
+    type Post{
+       title:String
+       details:String
+       comments: [Comment]
     }
 
-    input UserUpdateDetails{
-        firstName:String
-        lastName:String
-        gender:Gender
-        language:String
-        age:Int
-        email: String
-        password: String
-        role: String 
+    type Comment{
+        postId: String
+        commentor: String
+        commentDetails: String
     }
 
-    input UserId{
+    input PostId{
         _id:ID
     }
 
     type Query{
-        getAllUsers:[User]
-        getUserByID(userId: UserId):User
+        getAllPost:[Post]
+        getPostById(postId: PostId):Post
     }
 
     type Mutation{
-        createUser(input:UserInput):User
-        deleteUser(userId: UserId): Boolean
-        updateUser(userId: UserId, userUpdatedDetails:UserUpdateDetails): Boolean
+        createComment(commentInput: CommentInput): Comment
+        createPost(postInput: PostInput): Post
+        updatePost(postId: PostId, updatedDetails:UpdatedDetails):Boolean
+        deletePost(postId: PostId): Boolean
     }
-
 `;
 
 

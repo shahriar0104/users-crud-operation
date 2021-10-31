@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { environment } = require('../config/config');
-const { usersSchema } = require('./schema/usersSchema.ts');
+const { commentSchema } = require('./schema/commentSchema.ts')
+const { postsSchema } = require('./schema/postsSchema.ts');
+const { studentSchema } = require('./schema/studentSchema.ts')
 const env = process.env.NODE_ENV || "development";
 
 /**
@@ -17,6 +19,8 @@ db.on('error', () => {
     console.error("Error while connecting to DB");
 });
 
-const Users = mongoose.model('Users', usersSchema);
+const Posts = mongoose.model('Post', postsSchema);
+const Comments = mongoose.model("Comment", commentSchema)
+const Students = mongoose.model("Students", studentSchema)
 
-export { Users };
+export { Posts, Comments };
