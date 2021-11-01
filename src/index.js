@@ -1,3 +1,4 @@
+require('dotenv').config()
 import { ApolloServer } from 'apollo-server-hapi';
 import { resolvers } from '../data/resolvers.graphql';
 import { typeDefs } from '../data/schema.graphql';
@@ -10,7 +11,13 @@ const init = async () => {
         port: PORT
     });
     
-    const server = new ApolloServer({typeDefs, resolvers });
+    const server = new ApolloServer({typeDefs, resolvers
+        ,
+        context:({req, h}) => {
+            const auth = h.request.headers.authorization.split(' ')[1] || '';
+            return {auth}
+        }
+    });
 
     await server.start();
     await server.applyMiddleware({ app, cors: true });

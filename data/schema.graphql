@@ -1,10 +1,8 @@
 import { gql } from 'apollo-server-hapi';
 
 export const typeDefs = gql`
-
     input CommentInput{
         postId:String
-        commentor:String
         commentDetails:String
     }
 
@@ -16,6 +14,22 @@ export const typeDefs = gql`
     
     input UpdatedDetails{
         details:String
+    }
+
+    input PostId{
+        _id:ID
+    }
+
+    input CreateUserInput{
+        username: String
+        email: String
+        password: String
+        role: String
+    }
+
+    input SignInInput{
+        username: String
+        password: String
     }
 
     type Post{
@@ -30,8 +44,11 @@ export const typeDefs = gql`
         commentDetails: String
     }
 
-    input PostId{
-        _id:ID
+    type User{
+        username: String
+        email: String
+        password: String
+        role: String
     }
 
     type Query{
@@ -39,11 +56,17 @@ export const typeDefs = gql`
         getPostById(postId: PostId):Post
     }
 
+    type SignedIn{
+        JWT: String
+    }
+
     type Mutation{
         createComment(commentInput: CommentInput): Comment
         createPost(postInput: PostInput): Post
         updatePost(postId: PostId, updatedDetails:UpdatedDetails):Boolean
         deletePost(postId: PostId): Boolean
+        createUser(createUserInput: CreateUserInput): User
+        signIn(signInInput: SignInInput): SignedIn
     }
 `;
 

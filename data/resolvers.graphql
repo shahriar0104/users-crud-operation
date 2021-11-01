@@ -1,5 +1,7 @@
-import {Posts, Comments} from '../db/dbConnector.js'
-
+import {Posts, Comments, Users} from '../db/dbConnector.js'
+const sendJWTToken = require('./sendJWTToken')
+const isAuthenticated = require('./isAuthenticated')
+const {UserInputError, ValidationError, ForbiddenError} = require('apollo-server-hapi')
 /**
 * GraphQL Resolvers 
 **/
@@ -20,65 +22,126 @@ export const resolvers={
             }
     },
     Mutation:{
-        createPost: (root, {postInput}) => {
-            const newPost = new Posts({
-                title: postInput.title,
-                details: postInput.details,
-                comments: postInput.comments
-            })
-
-            newPost.id = newPost._id
-
-            return new Promise((resolve, reject) => {
-                newPost.save((err) => {
-                    if(err) reject (err)
-                    else resolve (newPost)
+        createPost:async (root, {postInput}, context) => {
+            const userInformation = await isAuthenticated.isValidUser(context.auth)
+            
+            if(!userInformation) throw new ValidationError('Unauthorized user')
+            else if(userInformation.role !== 'TEACHER') throw new ForbiddenError('Your are not permitted to do this')
+            else{
+                const newPost = new Posts({
+                    title: postInput.title,
+                    details: postInput.details,
+                    comments: postInput.comments
                 })
-            })
-        },
-        createComment: (root, {commentInput}) => {
-            const newComment = new Comments({
-                postId: commentInput.postId,
-                commentor: commentInput.commentor,
-                commentDetails: commentInput.commentDetails
-            })
 
-            newComment.id = newComment._id
+                newPost.id = newPost._id
 
-            return new Promise((resolve, reject) => {
-                newComment.save((err) => {
-                    if(err) reject (err)
-                    else{
-                        console.log(commentInput.postId)
-                        Posts.findById(commentInput.postId)
-                        .then((post) => {
-                            post.comments.push(newComment.id)
-                            post.save()
-                        })
-                        resolve (newComment)
-                    } 
+                return new Promise((resolve, reject) => {
+                    newPost.save((err) => {
+                        if(err) reject (err)
+                        else resolve (newPost)
+                    })
                 })
-            })
-        },
-        deletePost:async (root, {postId}) => {
-            try {
-                await Posts.findByIdAndDelete(postId)
-                await Comments.deleteMany({"postId": postId})
-                return true
-            }
-            catch (err) {
-                return false
             }
         },
-        updatePost: async (root, {postId,updatedDetails}) => {
-            try {
-                console.log(postId, updatedDetails)
-                await Posts.findByIdAndUpdate(postId,{
-                    details: updatedDetails.details
+        createComment:async (root, {commentInput}, context) => {
+            const userInformation = await isAuthenticated.isValidUser(context.auth)
+            console.log(userInformation.username)
+            if(!userInformation) throw new ValidationError('Unauthorized user')
+            else
+            {
+                const newComment = new Comments({
+                    postId: commentInput.postId,
+                    commentor: userInformation.username,
+                    commentDetails: commentInput.commentDetails
                 })
-                return true
-            } catch(err) {
-                return false
+
+                newComment.id = newComment._id
+
+                return new Promise((resolve, reject) => {
+                    newComment.save((err) => {
+                        if(err) reject (err)
+                        else{
+                            Posts.findById(commentInput.postId)
+                            .then((post) => {
+                                post.comments.push(newComment.id)
+                                post.save()
+                            })
+                            resolve (newComment)
+                        } 
+                    })
+                })
+            }
+            
+        },
+        deletePost:async (root, {postId}, context) => {
+            const userInformation = await isAuthenticated.isValidUser(context.auth)
+            
+            if(!userInformation) throw new ValidationError('Unauthorized user')
+            else if(userInformation.role !== 'TEACHER') throw new ForbiddenError('Your are not permitted to do this')
+            else{
+                try {
+                    await Posts.findByIdAndDelete(postId)
+                    await Comments.deleteMany({"postId": postId})
+                    return true
+                }
+                catch (err) {
+                    return false
+                }
+            }
+        },
+        updatePost: async (root, {postId,updatedDetails}, context) => {
+            const userInformation = await isAuthenticated.isValidUser(context.auth)
+            
+            if(!userInformation) throw new ValidationError('Unauthorized user')
+            else if(userInformation.role !== 'TEACHER') throw new ForbiddenError('Your are not permitted to do this')
+            else{
+                try {
+                    await Posts.findByIdAndUpdate(postId,{
+                        details: updatedDetails.details
+                    })
+                    return true
+                } catch(err) {
+                    return false
+                }
+            }
+        },
+        createUser: async (root, {createUserInput}, context) => {
+            const userInformation = await isAuthenticated.isValidUser(context.auth)
+            if(!userInformation) throw new ValidationError('Unauthorized user')
+            else if(userInformation.role !== 'TEACHER') throw new ForbiddenError('Your are not permitted to do this')
+            else{
+                const newUser = new Users({
+                    username: createUserInput.username,
+                    email: createUserInput.email,
+                    password: createUserInput.password,
+                    role: createUserInput.role
+                })
+                newUser.id = newUser._id
+
+                return new Promise((resolve, reject) => {
+                    newUser.save((err) => {
+                        if(err) reject (err)
+                        else resolve (newUser)
+                    })
+                })
+            }
+        },
+        signIn: async (root, {signInInput}) => {
+            const username = signInInput.username;
+            const password = signInInput.password;
+
+            const user = await Users.findOne({username}).select('password')
+            const userRole = await Users.findOne({username}).select('role')
+            if(!user) throw new UserInputError('Invalid username!')
+            else{
+                if(await user.matchPasswords(password, user.password)){
+                    const {cookieOptions, token} = sendJWTToken.sendToken(username, userRole.role)
+                    return {JWT: token}
+                }
+                else{
+                    throw new UserInputError('Wrong Password')
+                }
             }
         }
     }
