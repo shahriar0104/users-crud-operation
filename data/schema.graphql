@@ -58,6 +58,8 @@ export const typeDefs = gql`
 
     type SignedIn{
         JWT: String
+        username: String
+        role: String
     }
 
     type Mutation{
