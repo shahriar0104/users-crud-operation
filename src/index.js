@@ -8,13 +8,17 @@ import { PORT } from '../config/config';
 const init = async () => {
 
     const app = Hapi.server({
-        port: PORT
+        port: PORT,
+        routes:{
+            cors:true
+        }
     });
     
     const server = new ApolloServer({typeDefs, resolvers
         ,
         context:({req, h}) => {
-            const auth = h.request.headers.authorization.split(' ')[1] || '';
+            let auth = ''
+            if(h.request.headers.authorization) auth = h.request.headers.authorization.split(' ')[1]
             return {auth}
         }
     });
