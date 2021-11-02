@@ -34,8 +34,10 @@ export const typeDefs = gql`
 
     type Post{
        title:String
+       owner:String
        details:String
        comments: [Comment]
+       time: String
     }
 
     type Comment{

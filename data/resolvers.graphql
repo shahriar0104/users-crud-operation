@@ -30,6 +30,7 @@ export const resolvers={
             else{
                 const newPost = new Posts({
                     title: postInput.title,
+                    owner: userInformation.username,
                     details: postInput.details,
                     comments: postInput.comments
                 })
@@ -76,14 +77,18 @@ export const resolvers={
         },
         deletePost:async (root, {postId}, context) => {
             const userInformation = await isAuthenticated.isValidUser(context.auth)
-            
             if(!userInformation) throw new ValidationError('Unauthorized user')
             else if(userInformation.role !== 'TEACHER') throw new ForbiddenError('Your are not permitted to do this')
             else{
                 try {
-                    await Posts.findByIdAndDelete(postId)
-                    await Comments.deleteMany({"postId": postId})
-                    return true
+                    const post = await Posts.findById(postId).exec()
+                    if(post.owner !== userInformation.username)
+                        throw new ForbiddenError('Your are not the owner of this post')
+                    else{
+                        await Posts.findByIdAndDelete(postId)
+                        await Comments.deleteMany({"postId": postId})
+                        return true
+                    }
                 }
                 catch (err) {
                     return false
