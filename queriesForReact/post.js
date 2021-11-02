@@ -128,3 +128,18 @@
 //       "password":"abc5678"
 //     }
 //   }
+
+
+// query getstudents{
+//     getAllStudent{
+//         username
+//         email
+//     }
+// }
+
+// query getstudents{
+//     getAllTeacher{
+//         username
+//         email
+//     }
+// }

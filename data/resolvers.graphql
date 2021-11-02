@@ -19,6 +19,14 @@ export const resolvers={
             getPostById: (root, {postId})=>{
                 const post = Posts.findById(postId).populate('comments').exec()
                 return post;
+            },
+            getAllStudent: (root) => {
+                const students = Users.find({role:"STUDENT"}).exec()
+                return students;
+            },
+            getAllTeacher: (root) => {
+                const teachers= Users.find({role:"TEACHER"}).exec()
+                return teachers;
             }
     },
     Mutation:{
