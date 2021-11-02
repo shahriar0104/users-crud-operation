@@ -53,15 +53,18 @@ export const typeDefs = gql`
         role: String
     }
 
-    type Query{
-        getAllPost:[Post]
-        getPostById(postId: PostId):Post
-    }
-
     type SignedIn{
         JWT: String
         username: String
         role: String
+    }
+
+    
+    type Query{
+        getAllPost:[Post]
+        getPostById(postId: PostId):Post
+        getAllStudent:[User]
+        getAllTeacher:[User]
     }
 
     type Mutation{
