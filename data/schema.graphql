@@ -33,6 +33,7 @@ export const typeDefs = gql`
     }
 
     type Post{
+       _id:String
        title:String
        owner:String
        details:String
