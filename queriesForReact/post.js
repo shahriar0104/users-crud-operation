@@ -143,3 +143,13 @@
 //         email
 //     }
 // }
+
+// mutation DeleteUser($userId: UserId){
+//     deleteUser(userId: $userId)
+// }
+
+// {
+//     "userId":{
+//         "_id": "617f7b0dfeeba86123316b40"
+//     }
+// }
