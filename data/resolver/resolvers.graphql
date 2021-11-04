@@ -1,0 +1,66 @@
+import CreatePost from './createPost'
+import CreateComment from './createComment'
+import UpdatePost from './updatePost'
+import DeletePost from './deletePost'
+import CreateUser from './createUser'
+import SignIn from './signIn'
+import DeleteUser from './deleteUser'
+
+import {Posts, Comments, Users} from '../../db/dbConnector.js'
+const sendJWTToken = require('./../../authentication/sendJWTToken')
+const isAuthenticated = require('./../../authentication/isAuthenticated')
+const {UserInputError, ValidationError, ForbiddenError} = require('apollo-server-hapi')
+
+/**
+* GraphQL Resolvers 
+**/
+
+export const resolvers={
+    Query:{
+            getAllPost:(root, context)=>{
+                console.log(context)
+                return new Promise((resolve,reject)=>{
+                    Posts.find((err,posts)=>{
+                        if(err) reject(err);
+                        else resolve(posts);
+                    }).populate('comments')
+                })
+            },
+            getPostById: (root, {postId})=>{
+                const post = Posts.findById(postId).populate('comments').exec()
+                return post;
+            },
+            getAllStudent: (root) => {
+                const students = Users.find({role:"STUDENT"}).exec()
+                return students;
+            },
+            getAllTeacher: (root) => {
+                const teachers= Users.find({role:"TEACHER"}).exec()
+                return teachers;
+            }
+    },
+    Mutation:{
+        createPost:async (root, {postInput}, context) => {
+            console.log(context)
+            return CreatePost(postInput, context)
+        },
+        createComment:async (root, {commentInput}, context) => {
+            return CreateComment(commentInput, context)
+        },
+        deletePost:async (root, {postId}, context) => {
+            return DeletePost(postId, context)
+        },
+        updatePost: async (root, {postId,updatedDetails}, context) => {
+            return UpdatePost(postId, updatedDetails, context)
+        },
+        createUser: async (root, {createUserInput}, context) => {
+            return CreateUser(createUserInput, context)
+        },
+        signIn: async (root, {signInInput}) => {
+            return SignIn(signInInput)
+        },
+        deleteUser: async (root, {userId}, context) => {
+            return DeleteUser(userId, context)
+        }
+    }
+};

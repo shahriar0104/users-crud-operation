@@ -1,6 +1,6 @@
 require('dotenv').config()
 import { ApolloServer } from 'apollo-server-hapi';
-import { resolvers } from '../data/resolvers.graphql';
+import { resolvers } from '../data/resolver/resolvers.graphql';
 import { typeDefs } from '../data/schema.graphql';
 import Hapi from '@hapi/hapi';
 import { PORT } from '../config/config';

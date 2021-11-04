@@ -20,6 +20,10 @@ export const typeDefs = gql`
         _id:ID
     }
 
+    input UserId{
+        _id:ID
+    }
+
     input CreateUserInput{
         username: String
         email: String
@@ -74,8 +78,8 @@ export const typeDefs = gql`
         updatePost(postId: PostId, updatedDetails:UpdatedDetails):Boolean
         deletePost(postId: PostId): Boolean
         createUser(createUserInput: CreateUserInput): User
+        updateUser(userID: UserId): Boolean
+        deleteUser(userId: UserId): Boolean
         signIn(signInInput: SignInInput): SignedIn
     }
 `;
-
-
