@@ -12,7 +12,6 @@ export default async function CreatePost (postInput, context) {
             title: postInput.title,
             owner: userInformation.username,
             details: postInput.details,
-            comments: postInput.comments
         })
 
         newPost.id = newPost._id

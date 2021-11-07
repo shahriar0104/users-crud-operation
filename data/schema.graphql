@@ -9,7 +9,6 @@ export const typeDefs = gql`
     input PostInput{
         title: String
         details:String
-        comments: CommentInput
     }
     
     input UpdatedDetails{
