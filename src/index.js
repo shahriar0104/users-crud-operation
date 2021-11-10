@@ -9,18 +9,15 @@ const init = async () => {
 
     const app = Hapi.server({
         port: PORT,
-        routes:{
-            cors:true
-        }
     });
-    
+
     const server = new ApolloServer({
         typeDefs, resolvers
         ,
-        context:({req, h}) => {
+        context: ({ req, h }) => {
             let auth = ''
-            if(h.request.headers.authorization) auth = h.request.headers.authorization.split(' ')[1]
-            return {auth}
+            if (h.request.headers.authorization) auth = h.request.headers.authorization.split(' ')[1]
+            return { auth }
         }
     });
 
